@@ -9,19 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var appManager: ProductModel
-
+    
     var body: some View {
-        List{
-            ForEach(appManager.products, id: \.id) {item in
-                Text(item.title)
+        ScrollView(showsIndicators: false){
+            LazyVStack {
+                ForEach(appManager.products, id: \.id) {item in
+                        ProductView(product: item) 
+                }
             }
         }
-            .onAppear {
-                appManager.getProducts()
-            }
+        .padding(.horizontal, 20)
+        .onAppear {
+            appManager.getProducts()
+        }
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}

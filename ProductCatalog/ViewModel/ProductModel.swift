@@ -6,16 +6,21 @@
 //
 
 import Foundation
+import UIKit
+
 
 
 final class ProductModel: ObservableObject {
     
     @Published var products: [Product] = []
+    //@Published var productImage: UIImage?
     
-    let limit = 20 //есть возможность изменить в дальнейшем размер количества загруженных товаров
+    private let limit = 20 //есть возможность изменить в дальнейшем размер количества загруженных товаров
+    private var cache = NSCache<NSString, UIImage>()
+    
     var skip = Int()
     var netWork = NetworkServise()
-
+    
     func getProducts() {
         netWork.fetchProducts(urlString: networkRequest.getURLString(limit: limit, skip: skip)) { result in
             switch result {
@@ -27,6 +32,55 @@ final class ProductModel: ObservableObject {
             }
         }
     }
-}
     
+    
+    
+    func getImage(forKey key: String) -> UIImage? {
+        return cache.object(forKey: NSString(string: key))
+    }
+    
+    func setImage(_ image: UIImage, forKey key: String) {
+        cache.setObject(image, forKey: NSString(string: key))
+    }
+    
+//    func loadImage(url: String) -> UIImage? {
+//        var imageResult: UIImage?
+//        if let cachedImage = getImage(forKey: url) {
+//            return cachedImage
+//        } else {
+//            netWork.fetchImage(urlString: url) { result in
+//                switch result {
+//                case .success(let image):
+//                    self.setImage(image, forKey: url)
+//                    imageResult = image
+//                case .failure(let error):
+//                    print(error.localizedDescription)
+//                    imageResult = nil
+//                }
+//            }
+//            return imageResult
+//        }
+//    }
+    
+    func loadImage(url: String, completion: @escaping (UIImage?) -> Void) {
+        if let cachedImage = getImage(forKey: url) {
+            completion(cachedImage)
+        } else {
+            netWork.fetchImage(urlString: url) { result in
+                switch result {
+                case .success(let image):
+                    self.setImage(image, forKey: url)
+                    completion(image)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+}
+
+
+
 

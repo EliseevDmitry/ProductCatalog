@@ -13,14 +13,29 @@ struct ContentView: View {
     var body: some View {
         ScrollView(showsIndicators: false){
             LazyVStack {
-                ForEach(appManager.products, id: \.id) {item in
-                        ProductView(product: item) 
+                ForEach(appManager.products, id: \.uniqID) {item in
+                    ProductView(product: item)
+                        .onAppear {
+                            if item.uniqID == appManager.products.last?.uniqID {
+                                appManager.getProducts(completion: { item in
+                                    if let products = item {
+                                        appManager.products.append(contentsOf: products)
+                                        appManager.updateSkip()
+                                    }
+                               })
+                            }
+                        }
                 }
             }
         }
         .padding(.horizontal, 20)
         .onAppear {
-            appManager.getProducts()
+             appManager.getProducts(completion: { item in
+                 if let products = item {
+                     appManager.products.append(contentsOf: products)
+                     appManager.updateSkip()
+                 }
+            })
         }
     }
 }

@@ -63,6 +63,6 @@ struct ProductView: View {
 }
 
 
-#Preview {
-    ProductView(product: Product(id: 1, title: "Тестовый продукт", price: 1.99, stock: 5, thumbnail: "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png"))
-}
+//#Preview {
+//    ProductView(product: Product(id: 1, title: "Тестовый продукт", price: 1.99, stock: 5, thumbnail: "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png"))
+//}

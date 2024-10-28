@@ -18,15 +18,22 @@ final class ProductModel: ObservableObject {
     private let limit = 20 //есть возможность изменить в дальнейшем размер количества загруженных товаров
     private var cache = NSCache<NSString, UIImage>()
     
-    var skip = Int()
+    private var skip = Int()
     var netWork = NetworkServise()
     
-    func getProducts() {
+    func updateSkip(){
+        skip += limit
+    }
+    
+    func getProducts(completion: @escaping ([Product]?) -> Void) {
+        
+        print(networkRequest.getURLString(limit: limit, skip: skip))
         netWork.fetchProducts(urlString: networkRequest.getURLString(limit: limit, skip: skip)) { result in
             switch result {
             case .success(let requestProducts):
-                self.products = requestProducts.products
-                self.skip = requestProducts.skip
+               // self.products = requestProducts.products
+                //self.skip = requestProducts.skip
+                completion(requestProducts.products)
             case .failure(let error):
                 print(error.localizedDescription)
             }

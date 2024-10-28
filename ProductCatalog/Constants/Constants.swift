@@ -10,6 +10,6 @@ import Foundation
 struct networkRequest {
    //формируем запрос JSON - только по интересующим нас позициям - (product name, image, price, and quantity)
    static func getURLString(limit: Int, skip: Int) -> String {
-        return "https://dummyjson.com/products?limit=\(limit)&skip=\(skip)&select=id,title,price,stock,thumbnail"
+        return "https://dummyjson.com/products?limit=\(limit)&skip=\(skip)&select=title,price,stock,thumbnail"
     }
 }

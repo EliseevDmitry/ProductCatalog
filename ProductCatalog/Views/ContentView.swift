@@ -7,15 +7,15 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct ContentView: View {
+    @StateObject private var viewModel = ProductModel()
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        Text("Тестируем запрос")
+            .onAppear {
+                viewModel.fetchProducts()
+            }
     }
 }
 

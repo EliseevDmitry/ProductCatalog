@@ -13,20 +13,18 @@ import UIKit
 final class ProductModel: ObservableObject {
     
     @Published var products: [Product] = []
-    //@Published var productImage: UIImage?
-    
-    private let limit = 20 //есть возможность изменить в дальнейшем размер количества загруженных товаров
-    private var cache = NSCache<NSString, UIImage>()
-    
-    private var skip = Int()
     var netWork = NetworkServise()
+    
+    //есть возможность изменить в дальнейшем размер количества загруженных товаров
+    private let limit = 20
+    private var cache = NSCache<NSString, UIImage>()
+    private var skip = Int()
     
     func updateSkip(){
         skip += limit
     }
     
     func getProducts(completion: @escaping ([Product]?) -> Void) {
-        
         print(networkRequest.getURLString(limit: limit, skip: skip))
         netWork.fetchProducts(urlString: networkRequest.getURLString(limit: limit, skip: skip)) { result in
             switch result {
@@ -39,8 +37,6 @@ final class ProductModel: ObservableObject {
             }
         }
     }
-    
-    
     
     func getImage(forKey key: String) -> UIImage? {
         return cache.object(forKey: NSString(string: key))

@@ -14,19 +14,42 @@ final class ProductViewModel: ObservableObject {
     
     private var netWork = NetworkService()
     private var cache = CasheService()
+    private var isLoading = false
     private let limit = 20 //лимит запроса (количество товара)
-    private var skip = Int() //сдвиг при запросе
+    private var total = Int()
+    private var currentSkip = Int()
+    private var skip: Int {
+        get{
+            if total >= (currentSkip + limit) {
+               return currentSkip + limit
+            } else if total < (currentSkip + limit) {
+                return (self.total - currentSkip) + currentSkip
+            }
+            return Int()
+        }
+        set{
+            currentSkip = newValue
+        }
+    }
+    
     
     func getProducts(completion: @escaping ([Product]) -> Void) {
+        guard !isLoading else { return } // если уже идет загрузка, выходим
+                isLoading = true // устанавливаем флаг загрузки
         print(networkRequest.getURLString(limit: limit, skip: self.skip))
-        netWork.fetchProducts(urlString: networkRequest.getURLString(limit: limit, skip: self.skip)) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let requestProducts):
-                    self.skip += self.limit
-                    completion(requestProducts.products)
-                case .failure(let error):
-                    print(error.localizedDescription)
+        if !products.isEmpty && self.skip == self.total { return }
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.05) {
+            self.netWork.fetchProducts(urlString: networkRequest.getURLString(limit: self.limit, skip: self.skip)) { result in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    switch result {
+                    case .success(let requestProducts):
+                        self.total = requestProducts.total
+                        self.skip = requestProducts.skip
+                        completion(requestProducts.products)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
                 }
             }
         }

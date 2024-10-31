@@ -15,12 +15,13 @@ struct ProductView: View {
     var body: some View {
         ZStack {
             Rectangle()
-                .foregroundStyle(.gray)
+                .foregroundStyle(.cardApp)
                 .frame(height: 120)
                 .clipShape(.rect(cornerRadius: 10))
             HStack {
                 if isLoading {
                     ProgressView()
+                        .frame(width: 64, height: 64)
                         .padding(.leading, 20)
                 } else if let image = imageProduct {
                         Image(uiImage: image)
@@ -37,6 +38,7 @@ struct ProductView: View {
                     HStack{
                         Text("Total: \(product.stock.description)")
                             .padding(.leading, 20)
+                            .font(.callout)
                         Spacer()
                         Text("\(product.price.description)$")
                             .padding(.trailing, 20)
@@ -46,8 +48,8 @@ struct ProductView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.black)
+                .dynamicTypeSize(.xSmall ... .xLarge)
             }
-            
         }
         .onAppear() {
             loadImage()
@@ -55,10 +57,10 @@ struct ProductView: View {
     }
     func loadImage() {
         isLoading = true
-        appManager.loadImage(url: product.thumbnail) { image in
-            self.imageProduct = image
-            self.isLoading = false
-        }
+            appManager.loadImage(url: product.thumbnail) { image in
+                self.imageProduct = image
+                self.isLoading = false
+            }
     }
 }
 

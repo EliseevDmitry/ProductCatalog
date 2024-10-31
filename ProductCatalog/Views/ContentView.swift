@@ -10,21 +10,33 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var appManager: ProductViewModel
     var body: some View {
-        ScrollView(showsIndicators: false){
-            LazyVStack {
-                ForEach(appManager.products, id: \.uniqID) {item in
-                    ProductView(product: item)
-                        .onAppear {
-                            if item.uniqID == appManager.products.last?.uniqID {
-                                appManager.getProducts(completion: { products in
-                                    appManager.products.append(contentsOf: products)
-                                })
+        NavigationView{
+            ScrollView(showsIndicators: false){
+                LazyVStack {
+                    ForEach(appManager.products, id: \.uniqID) {item in
+                        ProductView(product: item)
+                            .onAppear {
+                                if item.uniqID == appManager.products.last?.uniqID {
+                                    appManager.getProducts(completion: { products in
+                                        appManager.products.append(contentsOf: products)
+                                    })
+                                }
                             }
-                        }
+                    }
+                    
                 }
+                
             }
+            .padding(.horizontal, 20)
+            .navigationTitle("Products:")
+            .navigationBarTitleDisplayMode(.large)
+            .font(.title)
+            .background(Color.bacgroundApp)
+            
         }
-        .padding(.horizontal, 20)
+        .dynamicTypeSize(.xSmall ... .xLarge)
+        
+     
         .onAppear {
             appManager.getProducts(completion: { products in
                 appManager.products.append(contentsOf: products)

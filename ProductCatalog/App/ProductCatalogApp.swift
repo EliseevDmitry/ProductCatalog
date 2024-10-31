@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct ProductCatalogApp: App {
-    @StateObject var appManager = ProductModel()
+    @StateObject var appManager = ProductViewModel()
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class NetworkServise {
+final class NetworkService {
     
     //сетевой запрос используя тип возвращаемого значения Result
     func fetchProducts(urlString: String, completion: @escaping (Result<Products, Error>)->Void) {
@@ -17,6 +17,7 @@ final class NetworkServise {
             return
         }
         URLSession.shared.dataTask(with: url) { data, response, error in
+            
             DispatchQueue.main.async {
                 if let error = error {
                     print("Error fetching image: \(error.localizedDescription)")

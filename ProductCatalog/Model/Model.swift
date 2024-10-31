@@ -20,31 +20,30 @@ struct Products: Decodable {
 //также ограничем запрос набором свойств у обьекта из задания (product name, image, price, and quantity)
 //по условиям задачи требуется после загрузки изменить размер картинки до "64x64 pixels", API позволяет загрузить "миниатюру" картинки из сети, что существенно увеличит скорость загрузки данных (условие 64x64 pixels - будет выполнено)
 struct Product: Decodable {
-    let title: String
-    let price: Float
-    let stock: UInt //товарный остаток не может быть меньше 0 поэтому UInt вместо Int
-    let thumbnail: String
     let uniqID: UUID
-    
+    let title: String
+    let thumbnail: String
+    let stock: UInt
+    let price: Float //товарный остаток не может быть меньше 0 поэтому UInt вместо Int
+
     enum CodingKeys: String, CodingKey {
         case id, title, price, stock, thumbnail
     }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.title = try container.decode(String.self, forKey: .title)
-        self.price = try container.decode(Float.self, forKey: .price)
-        self.stock = try container.decode(UInt.self, forKey: .stock)
-        self.thumbnail = try container.decode(String.self, forKey: .thumbnail)
         self.uniqID = UUID()
+        self.title = try container.decode(String.self, forKey: .title)
+        self.thumbnail = try container.decode(String.self, forKey: .thumbnail)
+        self.stock = try container.decode(UInt.self, forKey: .stock)
+        self.price = try container.decode(Float.self, forKey: .price)
     }
     
-    // Инициализатор для PreviewProvider - ProductView
     init(title: String, price: Float, stock: UInt, thumbnail: String) {
-        self.title = title
-        self.price = price
-        self.stock = stock
-        self.thumbnail = thumbnail
         self.uniqID = UUID()
+        self.title = title
+        self.thumbnail = thumbnail
+        self.stock = stock
+        self.price = price
     }
 }

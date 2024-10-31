@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var appManager: ProductModel
-    
+    @EnvironmentObject var appManager: ProductViewModel
     var body: some View {
         ScrollView(showsIndicators: false){
             LazyVStack {
@@ -17,12 +16,9 @@ struct ContentView: View {
                     ProductView(product: item)
                         .onAppear {
                             if item.uniqID == appManager.products.last?.uniqID {
-                                appManager.getProducts(completion: { item in
-                                    if let products = item {
-                                        appManager.products.append(contentsOf: products)
-                                        appManager.updateSkip()
-                                    }
-                               })
+                                appManager.getProducts(completion: { products in
+                                    appManager.products.append(contentsOf: products)
+                                })
                             }
                         }
                 }
@@ -30,16 +26,18 @@ struct ContentView: View {
         }
         .padding(.horizontal, 20)
         .onAppear {
-             appManager.getProducts(completion: { item in
-                 if let products = item {
-                     appManager.products.append(contentsOf: products)
-                     appManager.updateSkip()
-                 }
+            appManager.getProducts(completion: { products in
+                appManager.products.append(contentsOf: products)
             })
         }
     }
 }
 
-//#Preview {
-//    ContentView()
-//}
+//MARK: - PREVIEW
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        let model = ProductViewModel()
+        return ContentView()
+            .environmentObject(model)
+    }
+}

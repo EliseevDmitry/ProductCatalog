@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class NetworkServise {
+final class NetworkService {
     
     //сетевой запрос используя тип возвращаемого значения Result
     func fetchProducts(urlString: String, completion: @escaping (Result<Products, Error>)->Void) {

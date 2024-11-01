@@ -11,9 +11,9 @@ import UIKit
 final class ProductViewModel: ObservableObject {
     
     @Published var products: [Product] = []
-    
-    private var netWork = NetworkService()
-    private var cache = CasheService()
+    private var netWork = NetworkService() //сетевой сервис
+    private var cache = CasheService() // сервис кэширования загруженных изображений
+    let dispatchGroup = DispatchGroup()
     private var isLoading = false // флаг загрузки
     private let limit = 20 //лимит запроса (количество товара)
     private var total = Int() //обновляем из сети количество возможных зля запроса сущностей Product
@@ -22,7 +22,7 @@ final class ProductViewModel: ObservableObject {
     private var skip: Int {
         get{
             if total >= (currentSkip + limit) {
-               return currentSkip + limit
+                return currentSkip + limit
             } else if total < (currentSkip + limit) {
                 return (self.total - currentSkip) + currentSkip
             }
@@ -35,21 +35,31 @@ final class ProductViewModel: ObservableObject {
     
     //запрос сущности типа Products
     func getProducts(completion: @escaping ([Product]) -> Void) {
-        guard !isLoading else { return } // если уже идет загрузка, выходим
-                isLoading = true // устанавливаем флаг загрузки
-        print(NetworkRequest.getURLString(limit: limit, skip: self.skip))
-        if !products.isEmpty && self.skip == self.total { return }
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.05) {
-            //статическая функция NetworkRequest.getURLString - формирует URL: String c учетом пагинации
-            self.netWork.fetchProducts(urlString: NetworkRequest.getURLString(limit: self.limit, skip: self.skip)) { result in
-                //основной сетевой запрос отправляется в конкурентной очереди с qos: .default, после загрузки данных переходит в main поток
+        guard !isLoading else { return }
+        isLoading = true
+        if !products.isEmpty && self.skip == self.total {
+            isLoading = false
+            return
+        }
+        dispatchGroup.enter()
+        // Выполняем сетевой запрос в потоке qos: .default
+        DispatchQueue.global(qos: .default).async {
+            self.netWork.fetch(urlString: NetworkRequest.getURLString(limit: self.limit, skip: self.skip)) { result in
+                // Возвращаемся на главный поток для обновления UI
                 DispatchQueue.main.async {
                     self.isLoading = false
+                    self.dispatchGroup.leave()
                     switch result {
-                    case .success(let requestProducts):
-                        self.total = requestProducts.total
-                        self.skip = requestProducts.skip
-                        completion(requestProducts.products)
+                    case .success(let data):
+                        do {
+                            //декодирование Data() полученных из сети в сущность типа Products
+                            let products = try JSONDecoder().decode(Products.self, from: data)
+                            self.total = products.total
+                            self.skip = products.skip
+                            completion(products.products)
+                        } catch {
+                            print("Error to decode JSON decode", error.localizedDescription)
+                        }
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
@@ -58,16 +68,29 @@ final class ProductViewModel: ObservableObject {
         }
     }
     
+    //запрос изображений сущностей типа Product
     func loadImage(url: String, completion: @escaping (UIImage?) -> Void) {
         if let cachedImage = cache.getImage(forKey: url) {
             completion(cachedImage)
-        } else {
-            netWork.fetchImage(urlString: url) { result in
+            return
+        }
+        dispatchGroup.enter()
+        // Выполняем сетевой запрос в потоке qos: .default
+        DispatchQueue.global(qos: .default).async {
+            self.netWork.fetch(urlString: url) { result in
+                // Возвращаемся на главный поток для обновления UI
                 DispatchQueue.main.async {
+                    self.dispatchGroup.leave()
                     switch result {
-                    case .success(let image):
-                        self.cache.setImage(image, forKey: url)
-                        completion(image)
+                    case .success(let data):
+                        //инициализируем UIImage() через Data()
+                        if let image = UIImage(data: data) {
+                            self.cache.setImage(image, forKey: url)
+                            completion(image)
+                        } else {
+                            //в случае неудачи - возвращаем системную картинку
+                            completion(UIImage(systemName: Constants.image))
+                        }
                     case .failure(let error):
                         print(error.localizedDescription)
                         completion(nil)
@@ -77,6 +100,7 @@ final class ProductViewModel: ObservableObject {
         }
     }
     
+    //вункция отмены запроса сущности типа Products при Pull-to-Refresh в ContentView
     func refreshProducts() {
         guard !isLoading else { return }
         isLoading = true
@@ -85,5 +109,4 @@ final class ProductViewModel: ObservableObject {
             self.isLoading = false
         }
     }
-    
 }

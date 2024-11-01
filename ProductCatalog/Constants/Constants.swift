@@ -20,6 +20,7 @@ struct Constants {
     static let total = "Total:"
     //в API отсутствует указание в какой валюте приходят данные, объявлена статическая константа "$", можно было бы реализовать через "Locale.current.currency?.identifier"
     static let currency = "$"
+    static let image = "photo"
 }
 
 struct Preview {

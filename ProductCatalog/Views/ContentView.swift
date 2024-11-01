@@ -11,7 +11,7 @@ struct ContentView: View {
     //MARK: - PROPERTIES
     @EnvironmentObject var appManager: ProductViewModel
     //debouncer - ограничение по времени запросов при скролинге
-    let debouncer = Debouncer(delay: 1)
+    let debouncer = Debouncer(delay: 0.5)
     //MARK: - BODY
     var body: some View {
         NavigationView {

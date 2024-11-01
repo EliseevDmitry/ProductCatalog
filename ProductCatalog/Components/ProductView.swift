@@ -35,16 +35,20 @@ struct ProductView: View {
                 Spacer()
                 VStack(alignment: .center) {
                     Text(product.title.uppercased())
+                        .multilineTextAlignment(.center)
                         .font(.headline)
                         .padding(.bottom, 5)
+                        .foregroundStyle(.textApp)
                     HStack {
                         Text("\(Constants.total) \(product.stock.description)")
                             .padding(.leading, 20)
                             .font(.callout)
+                            .foregroundStyle(.textApp)
                         Spacer()
                         Text("\(product.price.description)\(Constants.currency)")
                             .padding(.trailing, 20)
                             .font(.largeTitle)
+                            .foregroundStyle(.textApp)
                             .bold()
                     }
                 }

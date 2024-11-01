@@ -5,7 +5,6 @@
 //  Created by Dmitriy Eliseev on 28.10.2024.
 //
 
-import Foundation
 import UIKit
 
 final class ProductViewModel: ObservableObject {
@@ -100,7 +99,7 @@ final class ProductViewModel: ObservableObject {
         }
     }
     
-    //вункция отмены запроса сущности типа Products при Pull-to-Refresh в ContentView
+    //функция отмены запроса сущности типа Products при Pull-to-Refresh в ContentView
     func refreshProducts() {
         guard !isLoading else { return }
         isLoading = true

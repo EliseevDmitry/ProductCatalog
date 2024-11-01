@@ -58,7 +58,7 @@ struct ProductView: View {
         }
     }
     //MARK: - FUNCTIONS
-    func loadImage() {
+    private func loadImage() {
         isLoading = true
         appManager.loadImage(url: product.thumbnail) { image in
             self.imageProduct = image

@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import UIKit
-
 
 final class NetworkService {
     private let session: URLSession
     
+    //настройка с URLSession с параметрами таймаута
     init() {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30

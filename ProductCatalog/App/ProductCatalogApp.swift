@@ -7,9 +7,10 @@
 
 import SwiftUI
 
+fileprivate let appManager = ProductViewModel()
+
 @main
 struct ProductCatalogApp: App {
-    @StateObject var appManager = ProductViewModel()
     var body: some Scene {
         WindowGroup {
             ContentView()

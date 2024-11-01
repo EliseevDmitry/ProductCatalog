@@ -13,7 +13,6 @@ struct Products: Decodable {
     let products: [Product]
     let total: Int
     let skip: Int
-    let limit: Int
 }
 
 //в структуре JSON - есть ID (он не уникальный, поэтому пришлось создавать свой uniqID: UUID - для дальнейшего управления данными)

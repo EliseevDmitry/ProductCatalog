@@ -11,8 +11,8 @@ final class ProductViewModel: ObservableObject {
     
     @Published var products: [Product] = []
     private var netWork = NetworkService() //сетевой сервис
+    private var dispatchGroup = DispatchGroup()
     private var cache = CasheService() // сервис кэширования загруженных изображений
-    let dispatchGroup = DispatchGroup()
     private var isLoading = false // флаг загрузки
     private let limit = 20 //лимит запроса (количество товара)
     private var total = Int() //обновляем из сети количество возможных зля запроса сущностей Product

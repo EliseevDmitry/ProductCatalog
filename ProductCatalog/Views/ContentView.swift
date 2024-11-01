@@ -8,42 +8,48 @@
 import SwiftUI
 
 struct ContentView: View {
+    //MARK: - PROPERTIES
     @EnvironmentObject var appManager: ProductViewModel
+    //debouncer - ограничение по времени запросов при скролинге
+    let debouncer = Debouncer(delay: 1)
+    //MARK: - BODY
     var body: some View {
-        NavigationView{
-            ScrollView(showsIndicators: false){
+        NavigationView {
+            ScrollView(showsIndicators: false) {
                 LazyVStack {
-                    ForEach(appManager.products, id: \.uniqID) {item in
+                    ForEach(appManager.products, id: \.uniqID) { item in
                         ProductView(product: item)
                             .onAppear {
                                 if item.uniqID == appManager.products.last?.uniqID {
-                                    appManager.getProducts(completion: { products in
-                                        appManager.products.append(contentsOf: products)
-                                    })
+                                    debouncer.debounce {
+                                        appManager.getProducts { products in
+                                            appManager.products.append(contentsOf: products)
+                                        }
+                                    }
                                 }
                             }
                     }
-                    
                 }
-                
             }
             .padding(.horizontal, 20)
-            .navigationTitle("Products:")
+            .navigationTitle(Constants.firstPageTitle)
             .navigationBarTitleDisplayMode(.large)
             .font(.title)
             .background(Color.bacgroundApp)
-            
+            .refreshable {
+                appManager.refreshProducts()
+                print(Constants.stopLoading)
+            }
         }
         .dynamicTypeSize(.xSmall ... .xLarge)
-        
-     
         .onAppear {
-            appManager.getProducts(completion: { products in
+            appManager.getProducts { products in
                 appManager.products.append(contentsOf: products)
-            })
+            }
         }
     }
 }
+
 
 //MARK: - PREVIEW
 struct ContentView_Previews: PreviewProvider {

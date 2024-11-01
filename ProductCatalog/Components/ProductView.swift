@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct ProductView: View {
+    //MARK: - PROPERTIES
     @EnvironmentObject var appManager: ProductViewModel
     @State private var imageProduct: UIImage?
     @State private var isLoading = true
     var product: Product
+    //MARK: - BODY
     var body: some View {
         ZStack {
             Rectangle()
@@ -24,23 +26,23 @@ struct ProductView: View {
                         .frame(width: 64, height: 64)
                         .padding(.leading, 20)
                 } else if let image = imageProduct {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 64, height: 64)
-                            .padding(.leading, 20)
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 64, height: 64)
+                        .padding(.leading, 20)
                 }
                 Spacer()
                 VStack(alignment: .center) {
                     Text(product.title.uppercased())
                         .font(.headline)
                         .padding(.bottom, 5)
-                    HStack{
-                        Text("Total: \(product.stock.description)")
+                    HStack {
+                        Text("\(Constants.total) \(product.stock.description)")
                             .padding(.leading, 20)
                             .font(.callout)
                         Spacer()
-                        Text("\(product.price.description)$")
+                        Text("\(product.price.description)\(Constants.currency)")
                             .padding(.trailing, 20)
                             .font(.largeTitle)
                             .bold()
@@ -55,12 +57,13 @@ struct ProductView: View {
             loadImage()
         }
     }
+    //MARK: - FUNCTIONS
     func loadImage() {
         isLoading = true
-            appManager.loadImage(url: product.thumbnail) { image in
-                self.imageProduct = image
-                self.isLoading = false
-            }
+        appManager.loadImage(url: product.thumbnail) { image in
+            self.imageProduct = image
+            self.isLoading = false
+        }
     }
 }
 
@@ -68,7 +71,7 @@ struct ProductView: View {
 struct ProductView_Previews: PreviewProvider {
     static var previews: some View {
         let model = ProductViewModel()
-        return ProductView(product: Product(title: "Тестовый продукт", price: 1.99, stock: 5, thumbnail: "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png"))
+        return ProductView(product: Preview.product)
             .environmentObject(model)
     }
 }

@@ -14,10 +14,11 @@ final class ProductViewModel: ObservableObject {
     
     private var netWork = NetworkService()
     private var cache = CasheService()
-    private var isLoading = false
+    private var isLoading = false // флаг загрузки
     private let limit = 20 //лимит запроса (количество товара)
-    private var total = Int()
+    private var total = Int() //обновляем из сети количество возможных зля запроса сущностей Product
     private var currentSkip = Int()
+    //вычисляемое свойство skip задание смещения при сетевом запросе, а также контроль за максимальным количеством запрашиваемых элементов из сети (total < (currentSkip + limit))
     private var skip: Int {
         get{
             if total >= (currentSkip + limit) {
@@ -32,14 +33,16 @@ final class ProductViewModel: ObservableObject {
         }
     }
     
-    
+    //запрос сущности типа Products
     func getProducts(completion: @escaping ([Product]) -> Void) {
         guard !isLoading else { return } // если уже идет загрузка, выходим
                 isLoading = true // устанавливаем флаг загрузки
-        print(networkRequest.getURLString(limit: limit, skip: self.skip))
+        print(NetworkRequest.getURLString(limit: limit, skip: self.skip))
         if !products.isEmpty && self.skip == self.total { return }
         DispatchQueue.global().asyncAfter(deadline: .now() + 0.05) {
-            self.netWork.fetchProducts(urlString: networkRequest.getURLString(limit: self.limit, skip: self.skip)) { result in
+            //статическая функция NetworkRequest.getURLString - формирует URL: String c учетом пагинации
+            self.netWork.fetchProducts(urlString: NetworkRequest.getURLString(limit: self.limit, skip: self.skip)) { result in
+                //основной сетевой запрос отправляется в конкурентной очереди с qos: .default, после загрузки данных переходит в main поток
                 DispatchQueue.main.async {
                     self.isLoading = false
                     switch result {
@@ -74,8 +77,13 @@ final class ProductViewModel: ObservableObject {
         }
     }
     
+    func refreshProducts() {
+        guard !isLoading else { return }
+        isLoading = true
+        getProducts { products in
+            self.products = products
+            self.isLoading = false
+        }
+    }
+    
 }
-
-
-
-

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class CasheService {
-    
+    //сервис кэширования загруженных изображений товаров
     private var cache = NSCache<NSString, UIImage>()
     
     func getImage(forKey key: String) -> UIImage? {
